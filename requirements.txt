@@ -1,0 +1,26 @@
+# Up-to-date package management tools
+pip
+setuptools
+wheel
+
+# Easy logging for monitoring code execution
+loguru
+
+# Environment variables management
+python-dotenv
+
+# Kafka Message Broker Integration
+kafka-python-ng
+
+# SQLite Database Management (SQLite is built into Python, but if you prefer a library to handle it easily)
+sqlite3  # This is typically included with Python, but some prefer to use SQLAlchemy for easier ORM management
+
+# Data Processing
+pandas
+
+# Data Visualization
+matplotlib
+numpy
+
+# For better handling of JSON messages
+simplejson
