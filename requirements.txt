@@ -24,3 +24,5 @@ numpy
 
 # For better handling of JSON messages
 simplejson
+
+kafka-python
