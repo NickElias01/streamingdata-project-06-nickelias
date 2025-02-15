@@ -13,7 +13,7 @@ python-dotenv
 kafka-python-ng
 
 # SQLite Database Management (SQLite is built into Python, but if you prefer a library to handle it easily)
-sqlite3  # This is typically included with Python, but some prefer to use SQLAlchemy for easier ORM management
+# sqlite3  # This is typically included with Python, but some prefer to use SQLAlchemy for easier ORM management
 
 # Data Processing
 pandas
