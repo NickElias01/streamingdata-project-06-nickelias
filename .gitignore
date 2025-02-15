@@ -1,3 +1,11 @@
+# This .gitignore file lists content that does NOT need to be tracked in the project history
+
+# macOS system files
+.DS_Store
+
+# Visual Studio Code settings and workspace folder
+.vscode/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
