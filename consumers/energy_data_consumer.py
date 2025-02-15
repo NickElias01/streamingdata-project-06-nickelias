@@ -2,10 +2,35 @@
 
 import json
 from kafka import KafkaConsumer
+import sqlite3
 
-# Define Kafka server and topic
-KAFKA_BROKER = 'localhost:9092'
-TOPIC_NAME = 'energy_usage'
+from dotenv import load_dotenv
+import os
+
+# Load environment variables from .env
+load_dotenv()
+
+# Get the Kafka topic from the environment variable
+kafka_topic = os.getenv('KAFKA_TOPIC')
+
+consumer = KafkaConsumer(
+    kafka_topic,  # Topic name loaded from .env file
+    bootstrap_servers='localhost:9092',
+    group_id='energy_group',
+    auto_offset_reset='earliest'
+)
+
+# Database setup
+conn = sqlite3.connect('energy_usage.db')
+c = conn.cursor()
+c.execute('''CREATE TABLE IF NOT EXISTS energy_usage
+             (region TEXT, timestamp REAL, usage REAL)''')
+conn.commit()
+
+def store_in_db(data):
+    c.execute('INSERT INTO energy_usage (region, timestamp, usage) VALUES (?, ?, ?)', 
+              (data['region'], data['timestamp'], data['usage']))
+    conn.commit()
 
 # Initialize Kafka consumer
 consumer = KafkaConsumer(
