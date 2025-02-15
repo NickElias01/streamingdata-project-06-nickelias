@@ -4,10 +4,16 @@ import time
 import json
 import random
 from kafka import KafkaProducer
+from dotenv import load_dotenv
+import os
 
-# Define Kafka server and topic
-KAFKA_BROKER = 'localhost:9092'
-TOPIC_NAME = 'energy_usage'
+# Load environment variables from .env
+load_dotenv()
+
+# Get Kafka configuration from environment variables
+KAFKA_BROKER = os.getenv('KAFKA_BROKER_ADDRESS')
+KAFKA_TOPIC = os.getenv('KAFKA_TOPIC')
+MESSAGE_INTERVAL = int(os.getenv('MESSAGE_INTERVAL_SECONDS', '5'))
 
 # Initialize Kafka producer
 producer = KafkaProducer(
@@ -36,9 +42,9 @@ def send_data():
     while True:
         for region in regions:
             data = generate_fake_data(region)
-            producer.send(TOPIC_NAME, value=data)
+            producer.send(KAFKA_TOPIC, value=data)
             print(f"Sent data to {region}: {data}")
-        time.sleep(5)  # Wait for 5 seconds before sending new data
+        time.sleep(MESSAGE_INTERVAL)
 
 if __name__ == '__main__':
     print("Producer is running...")

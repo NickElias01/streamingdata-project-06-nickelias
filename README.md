@@ -1,10 +1,7 @@
-# streamingdata-project-06-nickelias
-
 # Elias Analytics
-# Project Consumer: `project_consumer_nickelias.py`
+## streamingdata-project-06-nickelias
 
 ## Overview
-
 
 
 ## Requirements

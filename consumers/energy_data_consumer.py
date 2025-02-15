@@ -3,21 +3,25 @@
 import json
 from kafka import KafkaConsumer
 import sqlite3
-
 from dotenv import load_dotenv
 import os
 
 # Load environment variables from .env
 load_dotenv()
 
-# Get the Kafka topic from the environment variable
-kafka_topic = os.getenv('KAFKA_TOPIC')
+# Get Kafka configuration from environment variables
+KAFKA_TOPIC = os.getenv('KAFKA_TOPIC')
+KAFKA_BROKER = os.getenv('KAFKA_BROKER_ADDRESS')
+GROUP_ID = os.getenv('ENERGY_CONSUMER_GROUP_ID')
 
+
+# Initialize Kafka consumer (only once)
 consumer = KafkaConsumer(
-    kafka_topic,  # Topic name loaded from .env file
-    bootstrap_servers='localhost:9092',
-    group_id='energy_group',
-    auto_offset_reset='earliest'
+    KAFKA_TOPIC,
+    bootstrap_servers=KAFKA_BROKER,
+    group_id=GROUP_ID,
+    auto_offset_reset='earliest',
+    value_deserializer=lambda x: json.loads(x.decode('utf-8'))
 )
 
 # Database setup
