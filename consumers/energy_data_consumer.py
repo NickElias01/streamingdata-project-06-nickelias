@@ -36,20 +36,19 @@ def store_in_db(data):
               (data['region'], data['timestamp'], data['usage']))
     conn.commit()
 
-# Initialize Kafka consumer
-consumer = KafkaConsumer(
-    TOPIC_NAME,
-    bootstrap_servers=KAFKA_BROKER,
-    group_id='energy_usage_group',
-    value_deserializer=lambda x: json.loads(x.decode('utf-8'))
-)
-
 def consume_data():
     """Consume and process data from Kafka."""
     print("Consumer is running...")
-    for message in consumer:
-        data = message.value
-        print(f"Received data: {data}")
+    try:
+        for message in consumer:
+            data = message.value
+            print(f"Received data: {data}")
+            store_in_db(data)  # Add this line to store data in SQLite
+            print("Data stored in database")
+    except KeyboardInterrupt:
+        print("\nClosing consumer and database connection...")
+        consumer.close()
+        conn.close()
 
 if __name__ == '__main__':
     consume_data()
