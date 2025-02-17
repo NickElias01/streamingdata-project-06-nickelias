@@ -6,6 +6,7 @@ import random
 from kafka import KafkaProducer
 from dotenv import load_dotenv
 import os
+from datetime import datetime
 
 # Load environment variables from .env
 load_dotenv()
@@ -24,6 +25,10 @@ producer = KafkaProducer(
 def generate_fake_data(region):
     # Generate fake energy usage based on the region name and time
     usage_variation = random.uniform(10, 50)  # Random variation in usage
+
+    # Create human readable timestamp
+    current_time = datetime.now()
+    timestamp = current_time.strftime('%Y-%m-%d %H:%M:%S')
 
     # Add some randomness to make it seem like usage is fluctuating
     usage = round(100 + usage_variation + (time.time() % 10), 2)  # Varying energy usage
