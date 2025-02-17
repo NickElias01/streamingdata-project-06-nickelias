@@ -23,20 +23,21 @@ producer = KafkaProducer(
 )
 
 def generate_fake_data(region):
-    # Generate fake energy usage based on the region name and time
-    usage_variation = random.uniform(10, 50)  # Random variation in usage
+    """Generate fake energy data with temperature and renewable metrics."""
+    # Base power usage with random variation
+    power_usage = random.uniform(1000, 5000)  # kW
+    temperature = random.uniform(15, 35)  # Celsius
+    renewable_pct = random.uniform(10, 40)  # Percentage
 
-    # Create human readable timestamp
     current_time = datetime.now()
     timestamp = current_time.strftime('%Y-%m-%d %H:%M:%S')
-
-    # Add some randomness to make it seem like usage is fluctuating
-    usage = round(100 + usage_variation + (time.time() % 10), 2)  # Varying energy usage
 
     data = {
         'region': region,
         'timestamp': timestamp,
-        'usage': usage
+        'power_usage_kW': round(power_usage, 2),
+        'temperature_C': round(temperature, 2),
+        'renewable_percentage': round(renewable_pct, 2)
     }
     return data
 

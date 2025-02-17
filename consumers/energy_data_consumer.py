@@ -37,16 +37,24 @@ c = conn.cursor()
 c.execute('''CREATE TABLE IF NOT EXISTS energy_usage
             (region TEXT,
              timestamp TEXT,
-             usage REAL
+             power_usage_kW REAL,
+             temperature_C REAL,
+             renewable_percentage REAL
             )''')
 conn.commit()
 
-"""Store energy usage data in SQLite database."""
+
 def store_in_db(data):
+    """Store energy usage data in SQLite database."""
     try:
-        c.execute('''INSERT INTO energy_usage (region, timestamp, usage) 
-                    VALUES (?, ?, ?)''', 
-                 (data['region'], data['timestamp'], data['usage']))
+        c.execute('''INSERT INTO energy_usage 
+                    (region, timestamp, power_usage_kW, temperature_C, renewable_percentage) 
+                    VALUES (?, ?, ?, ?, ?)''', 
+                 (data['region'], 
+                  data['timestamp'], 
+                  data['power_usage_kW'],
+                  data['temperature_C'],
+                  data['renewable_percentage']))
         conn.commit()
         return True
     except sqlite3.Error as e:
