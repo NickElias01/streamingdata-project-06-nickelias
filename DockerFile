@@ -1,0 +1,22 @@
+FROM python:3.9-slim
+
+# Set working directory
+WORKDIR /app
+
+# Copy requirements first for better caching
+COPY requirements.txt .
+
+# Install dependencies
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy project files
+COPY . .
+
+# Set environment variables
+ENV PYTHONUNBUFFERED=1
+
+# Create directories for logs and data
+RUN mkdir -p logs/normal logs/alerts logs/errors data
+
+# Command to run - will be overridden by docker-compose
+CMD ["python", "-m", "producers.energy_data_producer"]
