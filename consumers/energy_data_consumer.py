@@ -10,6 +10,33 @@ import sys
 from consumers.visualizer import EnergyVisualizer
 from threading import Thread, Lock
 import matplotlib.pyplot as plt
+from datetime import datetime
+
+class AlertHandler:
+    @staticmethod
+    def check_alerts(data):
+        """Check data for alert conditions and return list of warnings."""
+        alerts = []
+        region = data['region']
+        timestamp = data['timestamp']
+        
+        # Power usage alerts
+        if data['power_usage_kW'] > 5000:
+            alerts.append(f"WARNING [{timestamp}] - HIGH POWER USAGE: {region} at {data['power_usage_kW']:.1f} kW")
+        elif data['power_usage_kW'] < 500:
+            alerts.append(f"WARNING [{timestamp}] - LOW POWER USAGE: {region} at {data['power_usage_kW']:.1f} kW")
+        
+        # Temperature alerts
+        if data['temperature_C'] > 50:
+            alerts.append(f"WARNING [{timestamp}] - HIGH TEMPERATURE: {region} at {data['temperature_C']:.1f}°C")
+        elif data['temperature_C'] < 0:
+            alerts.append(f"WARNING [{timestamp}] - LOW TEMPERATURE: {region} at {data['temperature_C']:.1f}°C")
+        
+        # Renewable percentage alert
+        if data['renewable_percentage'] < 5:
+            alerts.append(f"WARNING [{timestamp}] - LOW RENEWABLE %: {region} at {data['renewable_percentage']:.1f}%")
+        
+        return alerts
 
 # Load environment variables
 load_dotenv()
@@ -75,11 +102,19 @@ def consume_data(visualizer, db_handler):
         value_deserializer=lambda x: json.loads(x.decode('utf-8'))
     )
 
+    alert_handler = AlertHandler()
+
     try:
         for message in consumer:
             try:
                 data = message.value
                 print(f"Received data: {data}")
+                
+                # Check for alerts
+                alerts = alert_handler.check_alerts(data)
+                if alerts:
+                    for alert in alerts:
+                        print(f"\033[91m{alert}\033[0m")  # Print in red
                 
                 if db_handler.store_data(data):
                     print(f"Data stored in database: {data['region']} at {data['timestamp']}")
