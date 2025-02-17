@@ -33,7 +33,7 @@ Real-time energy monitoring system that tracks and visualizes power usage and te
 - [Docker Desktop](https://www.docker.com/products/docker-desktop/) (for quick start method)
 - [Apache Kafka & Zookeeper](https://kafka.apache.org/quickstart) (for manual installation method)
 
-## Quick Start with Docker (Recommended)
+## Quick Start with Docker (Optional, if not using Docker skip to [Manual Installation](#manual-installation))
 
 1. **Clone the repository:**
    ```bash

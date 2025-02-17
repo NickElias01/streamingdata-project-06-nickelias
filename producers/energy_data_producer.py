@@ -62,9 +62,9 @@ def generate_fake_data(region):
             - renewable_percentage: Renewable energy percentage
     """
     # Generate random values within realistic ranges
-    power_usage = random.uniform(POWER_LOW_THRESHOLD, POWER_HIGH_THRESHOLD)  # kW
-    temperature = random.uniform(TEMP_LOW_THRESHOLD, TEMP_HIGH_THRESHOLD)    # Celsius
-    renewable_pct = random.uniform(RENEWABLE_LOW_THRESHOLD, 40)             # Percentage
+    power_usage = random.uniform(0, 6000)  # kW
+    temperature = random.uniform(-5, 60)    # Celsius
+    renewable_pct = random.uniform(0, 40)             # Percentage
 
     # Create timestamp for current reading
     current_time = datetime.now()
