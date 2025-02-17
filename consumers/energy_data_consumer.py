@@ -1,96 +1,26 @@
-import matplotlib
-matplotlib.use('TkAgg')
-
+# Standard library imports
 import json
-from kafka import KafkaConsumer
-import sqlite3
-from dotenv import load_dotenv
 import os
 import sys
-from consumers.visualizer import EnergyVisualizer
-from threading import Thread, Lock
-import matplotlib.pyplot as plt
 from datetime import datetime
+from threading import Thread
 
-class AlertHandler:
-    @staticmethod
-    def check_alerts(data):
-        """Check data for alert conditions and return list of warnings."""
-        alerts = []
-        region = data['region']
-        timestamp = data['timestamp']
-        
-        # Power usage alerts
-        if data['power_usage_kW'] > 5000:
-            alerts.append(f"WARNING [{timestamp}] - HIGH POWER USAGE: {region} at {data['power_usage_kW']:.1f} kW")
-        elif data['power_usage_kW'] < 500:
-            alerts.append(f"WARNING [{timestamp}] - LOW POWER USAGE: {region} at {data['power_usage_kW']:.1f} kW")
-        
-        # Temperature alerts
-        if data['temperature_C'] > 50:
-            alerts.append(f"WARNING [{timestamp}] - HIGH TEMPERATURE: {region} at {data['temperature_C']:.1f}°C")
-        elif data['temperature_C'] < 0:
-            alerts.append(f"WARNING [{timestamp}] - LOW TEMPERATURE: {region} at {data['temperature_C']:.1f}°C")
-        
-        # Renewable percentage alert
-        if data['renewable_percentage'] < 5:
-            alerts.append(f"WARNING [{timestamp}] - LOW RENEWABLE %: {region} at {data['renewable_percentage']:.1f}%")
-        
-        return alerts
+# Third-party imports
+import matplotlib
+matplotlib.use('TkAgg')  # Must be before pyplot imports
+from kafka import KafkaConsumer
 
-# Load environment variables
-load_dotenv()
-
-# Get Kafka configuration
-KAFKA_TOPIC = os.getenv('KAFKA_TOPIC')
-KAFKA_BROKER = os.getenv('KAFKA_BROKER_ADDRESS')
-GROUP_ID = os.getenv('ENERGY_CONSUMER_GROUP_ID')
-BASE_DATA_DIR = os.getenv('BASE_DATA_DIR', 'data')
-SQLITE_DB_FILE_NAME = os.getenv('SQLITE_DB_FILE_NAME', 'energy_usage.sqlite')
-
-# Ensure data directory exists
-os.makedirs(BASE_DATA_DIR, exist_ok=True)
-db_path = os.path.join(BASE_DATA_DIR, SQLITE_DB_FILE_NAME)
-
-class DatabaseHandler:
-    def __init__(self, db_path):
-        self.db_path = db_path
-        self.lock = Lock()
-        self.setup_database()
-
-    def setup_database(self):
-        with sqlite3.connect(self.db_path) as conn:
-            c = conn.cursor()
-            c.execute('''CREATE TABLE IF NOT EXISTS energy_usage
-                        (region TEXT,
-                         timestamp TEXT,
-                         power_usage_kW REAL,
-                         temperature_C REAL,
-                         renewable_percentage REAL
-                        )''')
-            conn.commit()
-
-    def store_data(self, data):
-        try:
-            with self.lock:
-                with sqlite3.connect(self.db_path) as conn:
-                    c = conn.cursor()
-                    c.execute('''INSERT INTO energy_usage 
-                                (region, timestamp, power_usage_kW, temperature_C, renewable_percentage) 
-                                VALUES (?, ?, ?, ?, ?)''', 
-                             (data['region'], 
-                              data['timestamp'], 
-                              data['power_usage_kW'],
-                              data['temperature_C'],
-                              data['renewable_percentage']))
-                    conn.commit()
-            return True
-        except sqlite3.Error as e:
-            print(f"SQLite error: {e}")
-            return False
-        except Exception as e:
-            print(f"Unexpected error: {e}")
-            return False
+# Local application imports
+from utils.utils_config import (
+    KAFKA_TOPIC, 
+    KAFKA_BROKER, 
+    GROUP_ID, 
+    BASE_DATA_DIR, 
+    SQLITE_DB_FILE_NAME
+)
+from utils.utils_db_handler import DatabaseHandler
+from utils.utils_alert_handler import AlertHandler
+from consumers.visualizer import EnergyVisualizer
 
 def consume_data(visualizer, db_handler):
     """Consume and process data from Kafka."""
@@ -135,9 +65,12 @@ def consume_data(visualizer, db_handler):
         sys.exit(1)
 
 if __name__ == '__main__':
+    # Ensure data directory exists
+    os.makedirs(BASE_DATA_DIR, exist_ok=True)
+    
     # Create visualizer and database handler instances
     visualizer = EnergyVisualizer()
-    db_handler = DatabaseHandler(db_path)
+    db_handler = DatabaseHandler()
     
     # Start consumer in a separate thread
     consumer_thread = Thread(target=consume_data, args=(visualizer, db_handler))
