@@ -35,7 +35,7 @@ def generate_fake_data(region):
 
     data = {
         'region': region,
-        'timestamp': time.time(),
+        'timestamp': timestamp,
         'usage': usage
     }
     return data
