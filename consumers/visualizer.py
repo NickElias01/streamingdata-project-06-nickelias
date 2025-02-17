@@ -66,7 +66,7 @@ class EnergyVisualizer:
         self.ax2.set_xlabel('Region', fontsize=10)
         self.ax2.set_ylabel('Temperature (°C)', fontsize=10)
         self.bars = self.ax2.bar(self.regions, [0] * len(self.regions))
-        self.ax2.set_ylim(0, 40)  # Temperature range 0-40°C
+        self.ax2.set_ylim(-5, 60)  # Temperature range 0-40°C
         
         # Rotate x-axis labels for bar chart
         self.ax2.tick_params(axis='x', rotation=45)
