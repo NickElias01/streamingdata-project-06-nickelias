@@ -26,3 +26,5 @@ numpy
 simplejson
 
 kafka-python
+
+colorama

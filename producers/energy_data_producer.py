@@ -18,9 +18,9 @@ from datetime import datetime
 def generate_fake_data(region):
     """Generate fake energy data with temperature and renewable metrics."""
     # Base power usage with random variation
-    power_usage = random.uniform(POWER_LOW_THRESHOLD, POWER_HIGH_THRESHOLD)  # kW
-    temperature = random.uniform(TEMP_LOW_THRESHOLD, TEMP_HIGH_THRESHOLD)  # Celsius
-    renewable_pct = random.uniform(RENEWABLE_LOW_THRESHOLD, 40)  # Percentage
+    power_usage = random.uniform(0, 5500)  # kW
+    temperature = random.uniform(-5, 55)  # Celsius
+    renewable_pct = random.uniform(0, 40)  # Percentage
 
     current_time = datetime.now()
     timestamp = current_time.strftime('%Y-%m-%d %H:%M:%S')

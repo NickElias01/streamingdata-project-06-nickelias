@@ -21,6 +21,9 @@ from utils.utils_config import (
 from utils.utils_db_handler import DatabaseHandler
 from utils.utils_alert_handler import AlertHandler
 from consumers.visualizer import EnergyVisualizer
+from utils.utils_logger import setup_logger
+
+logger = setup_logger(__name__)
 
 def consume_data(visualizer, db_handler):
     """Consume and process data from Kafka."""
@@ -33,53 +36,64 @@ def consume_data(visualizer, db_handler):
     )
 
     alert_handler = AlertHandler()
+    logger.info("Kafka consumer started successfully")    
 
     try:
         for message in consumer:
             try:
                 data = message.value
-                print(f"Received data: {data}")
+                logger.info(f"Received data from {data['region']}: Power={data['power_usage_kW']}kW, "
+                          f"Temp={data['temperature_C']}°C")
                 
                 # Check for alerts
                 alerts = alert_handler.check_alerts(data)
                 if alerts:
                     for alert in alerts:
-                        print(f"\033[91m{alert}\033[0m")  # Print in red
+                        logger.warning(alert)
                 
                 if db_handler.store_data(data):
-                    print(f"Data stored in database: {data['region']} at {data['timestamp']}")
+                    logger.debug(f"Data stored in database: {data['region']} at {data['timestamp']}")
                     visualizer.update_data(data)
                 else:
-                    print("Failed to store data in database")
+                    logger.error(f"Failed to store data in database for {data['region']}")
                     
             except Exception as e:
-                print(f"Error processing message: {e}")
+                logger.error(f"Error processing message: {str(e)}")
                 continue
                 
     except KeyboardInterrupt:
-        print("\nClosing consumer...")
+        logger.info("Shutting down consumer gracefully...")
         consumer.close()
     except Exception as e:
-        print(f"Critical error: {e}")
+        logger.critical(f"Critical error in consumer: {str(e)}")
         consumer.close()
         sys.exit(1)
 
 if __name__ == '__main__':
-    # Ensure data directory exists
-    os.makedirs(BASE_DATA_DIR, exist_ok=True)
+    logger.info("Starting Energy Monitoring System")
     
-    # Create visualizer and database handler instances
-    visualizer = EnergyVisualizer()
-    db_handler = DatabaseHandler()
-    
-    # Start consumer in a separate thread
-    consumer_thread = Thread(target=consume_data, args=(visualizer, db_handler))
-    consumer_thread.daemon = True
-    consumer_thread.start()
-    
-    # Start visualization in main thread
     try:
+        # Ensure data directory exists
+        os.makedirs(BASE_DATA_DIR, exist_ok=True)
+        logger.debug(f"Ensured data directory exists: {BASE_DATA_DIR}")
+        
+        # Create visualizer and database handler instances
+        visualizer = EnergyVisualizer()
+        db_handler = DatabaseHandler()
+        logger.info("Initialized visualizer and database handler")
+        
+        # Start consumer in a separate thread
+        consumer_thread = Thread(target=consume_data, args=(visualizer, db_handler))
+        consumer_thread.daemon = True
+        consumer_thread.start()
+        logger.info("Started consumer thread")
+        
+        # Start visualization in main thread
+        logger.info("Starting visualization...")
         visualizer.start()
     except KeyboardInterrupt:
-        print("Shutting down...")
+        logger.info("Shutting down by user request...")
         sys.exit(0)
+    except Exception as e:
+        logger.critical(f"Application failed to start: {str(e)}")
+        sys.exit(1)
