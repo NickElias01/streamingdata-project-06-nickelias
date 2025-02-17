@@ -5,6 +5,7 @@ Real-time energy monitoring system that tracks and visualizes power usage and te
 
 ## Table of Contents
 - [Features](#features)
+- [Component Details](#component-details)
 - [Prerequisites](#prerequisites)
 - [Quick Start with Docker](#quick-start-with-docker-recommended)
 - [Manual Installation](#manual-installation)
@@ -25,6 +26,35 @@ Real-time energy monitoring system that tracks and visualizes power usage and te
 - ⚠️ Automated alert system for threshold violations
 - 💾 Data persistence with SQLite
 - 📝 Comprehensive logging system
+
+## Component Details
+
+### Consumer Script
+The consumer script (`consumers/energy_data_consumer.py`) is responsible for:
+
+#### Data Processing
+- Receives real-time energy metrics from Kafka
+- Processes messages containing power usage and temperature data
+- Handles data for multiple Colorado regions concurrently
+
+#### Visualization
+- Creates dynamic line plots showing power usage trends
+- Displays real-time bar charts of temperature readings
+- Updates visualization every second
+- Color-codes different regions for easy identification
+
+#### Alert System
+- Monitors for threshold violations:
+  - High/Low power usage (>5000kW or <500kW)
+  - Extreme temperatures (>50°C or <0°C)
+  - Low renewable energy percentage (<5%)
+- Generates immediate alerts for any violations
+- Logs alerts to separate alert log files
+
+#### Data Storage
+- Persists all readings to SQLite database
+- Maintains historical data for trend analysis
+- Ensures data integrity with thread-safe operations
 
 ## Prerequisites
 
