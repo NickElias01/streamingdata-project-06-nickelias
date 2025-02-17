@@ -1,28 +1,70 @@
+"""
+Energy Data Visualizer
+--------------------
+
+Real-time visualization component for the Energy Monitoring Suite.
+Provides dynamic plotting capabilities for power usage and temperature data
+across multiple regions.
+
+This module is part of the Energy Monitoring Suite developed by Elias Analytics.
+It handles the real-time visualization of energy metrics using matplotlib,
+featuring a dual-plot display with line graphs for power usage trends and
+bar charts for current temperature readings.
+
+Features:
+    - Real-time line plot of power usage over time
+    - Dynamic bar chart of current temperatures
+    - Auto-scaling axes with time-based padding
+    - Color-coded regions for easy identification
+    - Temperature labels on bar charts
+    - Configurable data point window
+
+Author: Elias Analytics
+Version: 1.0.0
+License: MIT
+"""
+
+# Set matplotlib backend before importing pyplot
 import matplotlib
 matplotlib.use('TkAgg')  # Must be called before importing pyplot
 
+# Standard library imports
+import datetime
+from collections import deque
+
+# Third-party visualization imports
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
-from collections import deque
-import datetime
 
 class EnergyVisualizer:
-    def __init__(self, max_points=5):  # Reduce max_points to show fewer data points
+    """
+    Real-time energy data visualizer using matplotlib.
+    
+    Creates and manages two synchronized plots:
+    1. Line plot showing power usage over time for each region
+    2. Bar chart showing current temperature readings for each region
+    
+    Args:
+        max_points (int): Maximum number of data points to display in line plot
+    """
+    
+    def __init__(self, max_points=5):
+        # Initialize basic parameters
         self.max_points = max_points
         self.regions = ['Denver', 'Boulder', 'Aurora', 'Lakewood', 'Golden']
-        # Use deque with maxlen to automatically maintain window size
-        self.data = {region: {'times': deque(maxlen=max_points),
-                             'usage': deque(maxlen=max_points),
-                             'temperature': deque(maxlen=1)
-            } for region in self.regions}
         
-        # Store animation object as instance variable
-        self.ani = None
-
-        # Setup the plot
+        # Initialize data storage using deque for automatic size management
+        self.data = {region: {
+            'times': deque(maxlen=max_points),      # Timestamp storage
+            'usage': deque(maxlen=max_points),      # Power usage storage
+            'temperature': deque(maxlen=1)          # Current temperature
+        } for region in self.regions}
+        
+        # Create matplotlib figure with two subplots
         self.fig, (self.ax1, self.ax2) = plt.subplots(1, 2, figsize=(20, 8))
-        self.lines = {}
-        self.setup_plot()
+        self.lines = {}                            # Store line objects for updating
+        self.ani = None                           # Animation object placeholder
+        self.setup_plot()                         # Initialize plot settings
 
     def setup_plot(self):
         """Initialize the plot settings."""
@@ -78,45 +120,69 @@ class EnergyVisualizer:
         # Adjust layout to prevent label cutoff
         plt.tight_layout()
 
-
     def update_data(self, data):
-        """Update data for a specific region."""
+        """
+        Update data storage with new readings.
+        
+        Args:
+            data (dict): Dictionary containing new readings with keys:
+                        'region', 'timestamp', 'power_usage_kW', 'temperature_C'
+        """
         region = data['region']
+        # Convert timestamp string to datetime object and store new data
         self.data[region]['times'].append(
             datetime.datetime.strptime(data['timestamp'], '%Y-%m-%d %H:%M:%S'))
         self.data[region]['usage'].append(data['power_usage_kW'])
         self.data[region]['temperature'].append(data['temperature_C'])
 
     def animate(self, frame):
-        """Update the line plot."""
+        """
+        Animation function called by FuncAnimation.
+        Updates both plots with current data.
+        
+        Args:
+            frame: Frame number (unused but required by FuncAnimation)
+        
+        Returns:
+            list: Collection of line objects for blitting
+        """
+        # Update line plot for each region
         for region in self.regions:
             times = list(self.data[region]['times'])
             usage = list(self.data[region]['usage'])
             if times and usage:
                 self.lines[region].set_data(times, usage)
 
-            # Update bar plot
-        temperatures = [self.data[region]['temperature'][-1] 
-                   if self.data[region]['temperature'] 
-                   else 0 
-                   for region in self.regions]
+        # Update temperature bar chart
+        temperatures = [
+            self.data[region]['temperature'][-1] 
+            if self.data[region]['temperature'] 
+            else 0 
+            for region in self.regions
+        ]
     
+        # Update bar heights and labels
         for bar, temp in zip(self.bars, temperatures):
             bar.set_height(temp)
-            # Remove existing text if present
+            # Clear existing temperature labels
             for txt in self.ax2.texts:
                 txt.remove()
-            # Add new temperature labels on top of each bar
+            # Add updated temperature labels
             for rect in self.bars:
                 height = rect.get_height()
-                self.ax2.text(rect.get_x() + rect.get_width()/2., height,
-                            f'{height:.1f}°C',
-                            ha='center', va='bottom')
+                self.ax2.text(
+                    rect.get_x() + rect.get_width()/2., 
+                    height,
+                    f'{height:.1f}°C',
+                    ha='center', 
+                    va='bottom'
+                )
 
-        # Adjust line plot limits
+        # Adjust line plot time axis with padding
         if any(len(self.data[region]['times']) > 0 for region in self.regions):
             all_times = [t for r in self.regions for t in self.data[r]['times']]
             if all_times:
+                # Calculate time range and add 10% padding
                 min_time = min(all_times)
                 max_time = max(all_times)
                 time_range = max_time - min_time
@@ -125,20 +191,22 @@ class EnergyVisualizer:
                     min_time - datetime.timedelta(seconds=padding.total_seconds()),
                     max_time + datetime.timedelta(seconds=padding.total_seconds())
                 )
-            self.ax1.set_ylim(0, 10000)
+            self.ax1.set_ylim(0, 10000)  # Fixed power usage range
         
-        # Adjust layout
+        # Ensure proper layout
         self.fig.tight_layout()
         return self.lines.values()
 
-       
     def start(self):
-        """Start the animation."""
+        """
+        Start the real-time visualization.
+        Initializes animation and displays the plot window.
+        """
         self.ani = FuncAnimation(
             self.fig, 
             self.animate, 
-            interval=1000,
-            cache_frame_data=False,
-            blit=False  # Changed to False for better stability
+            interval=1000,          # Update every second
+            cache_frame_data=False, # Disable caching for real-time display
+            blit=False             # Disable blitting for stability
         )
-        plt.show(block=True)  # Added block=True
+        plt.show(block=True)      # Show plot window and block execution

@@ -1,83 +1,134 @@
-# Elias Analytics
-## streamingdata-project-06-nickelias
+# Energy Monitoring Suite by Elias Analytics
 
-## Overview
+Real-time energy monitoring system that tracks and visualizes power usage and temperature data across multiple regions in Colorado.
 
+## Features
 
-## Requirements
+- 📊 Real-time power usage visualization
+- 🌡️ Temperature monitoring across regions
+- ⚡ Renewable energy percentage tracking
+- ⚠️ Automated alert system for threshold violations
+- 💾 Data persistence with SQLite
+- 📝 Comprehensive logging system
 
-- Python 3.x
-- Kafka broker running
-- Required Python packages:
-  ```bash
-  pip install kafka-python python-dotenv matplotlib
+## Prerequisites
 
-## Setting Up Kafka & Zookeeper
+- Python 3.9 or higher
+- Docker Desktop (recommended)
+- Windows, macOS, or Linux
 
-Before running the producer and consumer, ensure that both Zookeeper and Kafka services are running.
+## Quick Start with Docker (Recommended)
 
-### Start Zookeeper Service (Terminal 1)
-1. Open a terminal (WSL/Mac/Linux).
-2. Navigate to the Kafka directory:
+1. **Clone the repository:**
    ```bash
-   cd ~/kafka
+   git clone https://github.com/yourusername/streamingdata-project-06-nickelias.git
+   cd streamingdata-project-06-nickelias
    ```
-3. Ensure the script has execute permissions (may not be necessary):
-   ```bash
-   chmod +x zookeeper-server-start.sh
-   ```
-4. Start the Zookeeper service:
-   ```bash
-   bin/zookeeper-server-start.sh config/zookeeper.properties
-   ```
-5. **Keep this terminal open** while working with Kafka.
 
-### Start Kafka (Terminal 2)
-1. Open a **new terminal**. (On Windows, open PowerShell and run `wsl` to get a WSL terminal first.)
-2. Navigate to the Kafka directory:
+2. **Create `.env` file:**
    ```bash
-   cd ~/kafka
+   copy .env.template .env
    ```
-3. Ensure the script has execute permissions (may not be necessary):
+
+3. **Build and run with Docker Compose:**
    ```bash
-   chmod +x kafka-server-start.sh
+   docker-compose up --build
    ```
-4. Start the Kafka service:
+
+This will start all services: Kafka, Zookeeper, Producer, and Consumer.
+
+## Manual Installation
+
+1. **Set up Python environment:**
    ```bash
-   bin/kafka-server-start.sh config/server.properties
+   python -m venv .venv
+   .\.venv\Scripts\activate  # Windows
+   source .venv/bin/activate # Linux/macOS
    ```
-5. **Keep this terminal open** while working with Kafka.
 
+2. **Install dependencies:**
+   ```bash
+   pip install -r requirements.txt
+   ```
 
-## Running the Project Producer (Terminal 3)
+3. **Create `.env` file:**
+   ```bash
+   copy .env.template .env
+   ```
 
-To run the Kafka producer provided in the project without modifications, open a terminal and run:
+4. **Start Kafka and Zookeeper:**
+   - Download and extract [Kafka](https://kafka.apache.org/downloads)
+   - Start Zookeeper (Terminal 1):
+     ```bash
+     cd kafka_directory
+     bin/zookeeper-server-start.sh config/zookeeper.properties
+     ```
+   - Start Kafka (Terminal 2):
+     ```bash
+     cd kafka_directory
+     bin/kafka-server-start.sh config/server.properties
+     ```
 
-```bash
-.\.venv\Scripts\activate
-py -m producers.energy_data_producer
+5. **Run the Producer (Terminal 3):**
+   ```bash
+   python -m producers.energy_data_producer
+   ```
+
+6. **Run the Consumer (Terminal 4):**
+   ```bash
+   python -m consumers.energy_data_consumer
+   ```
+
+## Project Structure
+
+```
+streamingdata-project-06-nickelias/
+├── consumers/              # Consumer components
+├── producers/              # Producer components
+├── utils/                 # Utility modules
+├── logs/                  # Application logs
+│   ├── normal/           # Regular operation logs
+│   ├── alerts/           # Warning and threshold alerts
+│   └── errors/           # Error and critical logs
+├── data/                 # SQLite database
+├── docker-compose.yml    # Docker configuration
+├── requirements.txt      # Python dependencies
+└── README.md            # This file
 ```
 
-> **Note:** Ensure that Kafka is running before executing the producer to avoid connection issues.
+## Monitoring and Logs
 
-## Running the New Project Consumer (Terminal 4)
+- **Normal operations:** `logs/normal/normal_YYYYMMDD.log`
+- **Alert conditions:** `logs/alerts/alerts_YYYYMMDD.log`
+- **Error logs:** `logs/errors/errors_YYYYMMDD.log`
 
-To run the `project_consumer_nickelias.py` script, open a terminal and execute:
+## Configuration
 
-```bash
-.\.venv\Scripts\activate
-py -m consumers.energy_data_consumer
+Key settings in `.env`:
+```ini
+KAFKA_TOPIC=energy_data
+KAFKA_BROKER=kafka:9092
+MESSAGE_INTERVAL_SECONDS=5
 ```
 
-This will start the consumer, and you'll see the real-time bar chart updating as new messages are processed.
+## Troubleshooting
 
+1. **No visualization?**
+   - Ensure X11 forwarding is enabled
+   - Check matplotlib backend settings
 
+2. **Connection refused?**
+   - Verify Kafka and Zookeeper are running
+   - Check broker address in `.env`
 
-## Additional Notes
+3. **No data flowing?**
+   - Confirm producer is running
+   - Check Kafka topic exists
 
-- **Dependencies:** Ensure you have installed the required dependencies:
-  - `matplotlib`
-  - `kafka-python` (or your preferred Kafka client library)
-  - `python-dotenv`
-- **Configuration:** Update your `.env` file with the correct Kafka topic and consumer group ID.
-- **Kafka Setup:** Refer to the Kafka and Zookeeper setup instructions above to ensure both services are running before starting the producer and consumer.
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Support
+
+For issues and questions, please open a GitHub issue.
