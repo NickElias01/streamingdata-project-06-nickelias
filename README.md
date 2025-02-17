@@ -1,6 +1,21 @@
-# Energy Monitoring Suite by Elias Analytics
+# Colorado Regional Energy Monitoring Suite by Elias Analytics
 
 Real-time energy monitoring system that tracks and visualizes power usage and temperature data across multiple regions in Colorado.
+
+
+## Table of Contents
+- [Features](#features)
+- [Prerequisites](#prerequisites)
+- [Quick Start with Docker](#quick-start-with-docker-recommended)
+- [Manual Installation](#manual-installation)
+- [Project Structure](#project-structure)
+- [Monitoring and Logs](#monitoring-and-logs)
+- [Configuration](#configuration)
+- [Troubleshooting](#troubleshooting)
+- [License](#license)
+- [Support](#support)
+
+
 
 ## Features
 
@@ -13,15 +28,16 @@ Real-time energy monitoring system that tracks and visualizes power usage and te
 
 ## Prerequisites
 
-- Python 3.9 or higher
-- Docker Desktop (recommended)
 - Windows, macOS, or Linux
+- Python 3.9 or higher
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/) (for quick start method)
+- [Apache Kafka & Zookeeper](https://kafka.apache.org/quickstart) (for manual installation method)
 
 ## Quick Start with Docker (Recommended)
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/yourusername/streamingdata-project-06-nickelias.git
+   git clone https://github.com/NickElias01/streamingdata-project-06-nickelias.git
    cd streamingdata-project-06-nickelias
    ```
 
