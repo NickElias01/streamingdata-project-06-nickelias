@@ -106,12 +106,12 @@ This will start all services: Kafka, Zookeeper, Producer, and Consumer.
    - Download and extract [Kafka](https://kafka.apache.org/downloads)
    - Start Zookeeper (Terminal 1):
      ```bash
-     cd kafka_directory
+     cd ~/kafka
      bin/zookeeper-server-start.sh config/zookeeper.properties
      ```
    - Start Kafka (Terminal 2):
      ```bash
-     cd kafka_directory
+     cd ~/kafka
      bin/kafka-server-start.sh config/server.properties
      ```
 

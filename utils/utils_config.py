@@ -42,7 +42,7 @@ GROUP_ID = os.getenv('ENERGY_CONSUMER_GROUP_ID', 'energy_monitor')
 # -----------------------
 BASE_DATA_DIR = os.getenv('BASE_DATA_DIR', 'data')
 SQLITE_DB_FILE_NAME = os.getenv('SQLITE_DB_FILE_NAME', 'energy_usage.sqlite')
-MESSAGE_INTERVAL = int(os.getenv('MESSAGE_INTERVAL_SECONDS', '5'))
+MESSAGE_INTERVAL = int(os.getenv('MESSAGE_INTERVAL_SECONDS', '60'))
 
 # Regional Configuration
 # --------------------
