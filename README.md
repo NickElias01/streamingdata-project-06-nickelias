@@ -5,6 +5,7 @@ Real-time energy monitoring system that tracks and visualizes power usage and te
 
 ## Table of Contents
 - [Features](#features)
+- [API Integration](#api-integration)
 - [Component Details](#component-details)
 - [Prerequisites](#prerequisites)
 - [Quick Start with Docker](#quick-start-with-docker-recommended)
@@ -26,6 +27,40 @@ Real-time energy monitoring system that tracks and visualizes power usage and te
 - ⚠️ Automated alert system for threshold violations
 - 💾 Data persistence with SQLite
 - 📝 Comprehensive logging system
+
+## API Integration
+
+The system uses the Open-Meteo API to fetch real-time temperature data for each monitored region:
+
+- **API Provider**: [Open-Meteo](https://open-meteo.com/)
+- **Endpoint**: Current Weather Data
+- **Data Points**: Temperature in Celsius
+- **Regions**: Denver, Boulder, Aurora, Lakewood, Golden
+
+### Features
+- Real-time temperature data fetching
+- Automatic fallback to synthetic data if API fails
+- Rate-limit compliant
+- Error handling with logging
+
+### Testing API Connection
+
+To verify API connectivity:
+```bash
+python -m tests.test_weather_api
+```
+
+Expected output:
+```
+Testing Open-Meteo API connection for all regions...
+--------------------------------------------------
+✅ Denver: 23.5°C
+✅ Boulder: 22.1°C
+✅ Aurora: 23.8°C
+✅ Lakewood: 22.9°C
+✅ Golden: 21.7°C
+--------------------------------------------------
+```
 
 ## Component Details
 
