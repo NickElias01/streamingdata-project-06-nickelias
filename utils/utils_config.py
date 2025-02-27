@@ -46,13 +46,35 @@ MESSAGE_INTERVAL = int(os.getenv('MESSAGE_INTERVAL_SECONDS', '5'))
 
 # Regional Configuration
 # --------------------
-REGIONS = [
-    'Denver',    # Capital city
-    'Boulder',   # Tech hub
-    'Aurora',    # Eastern metro
-    'Lakewood',  # Western metro
-    'Golden'     # Mining district
-]
+REGIONS_CONFIG = {
+    'Denver': {
+        'name': 'Denver',    # Capital city
+        'lat': 39.7392,
+        'lon': -104.9903
+    },
+    'Boulder': {
+        'name': 'Boulder',   # Tech hub
+        'lat': 40.0150,
+        'lon': -105.2705
+    },
+    'Aurora': {
+        'name': 'Aurora',    # Eastern metro
+        'lat': 39.7294,
+        'lon': -104.8319
+    },
+    'Lakewood': {
+        'name': 'Lakewood',  # Western metro
+        'lat': 39.7047,
+        'lon': -105.0814
+    },
+    'Golden': {
+        'name': 'Golden',    # Mining district
+        'lat': 39.7555,
+        'lon': -105.2211
+    }
+}
+
+REGIONS = list(REGIONS_CONFIG.keys())
 
 # Monitoring Thresholds
 # -------------------

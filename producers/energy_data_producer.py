@@ -42,6 +42,10 @@ import json
 import random
 from datetime import datetime
 from kafka import KafkaProducer
+import requests
+
+# Import api data from utilities
+from utils.utils_weather import get_region_temperature
 
 def generate_fake_data(region):
     """
@@ -61,9 +65,14 @@ def generate_fake_data(region):
             - temperature_C: Temperature in Celsius
             - renewable_percentage: Renewable energy percentage
     """
+    
+     # Get real temperature data, fall back to random if API fails
+    temperature = get_region_temperature(region)
+    if temperature is None:
+        temperature = random.uniform(-5, 60)    # Celsius
+    
     # Generate random values within realistic ranges
     power_usage = random.uniform(0, 6000)  # kW
-    temperature = random.uniform(-5, 60)    # Celsius
     renewable_pct = random.uniform(0, 40)             # Percentage
 
     # Create timestamp for current reading
